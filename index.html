@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>Dragon Ball Radar</title>
+  <style>
+    body { margin:0; overflow:hidden; font-family:sans-serif; }
+    #info { position: absolute; top: 10px; left: 10px; color: white; z-index: 2; }
+  </style>
+</head>
+<body>
+<div id="info">Ancla las bolas de dragon en algun punto del entorno y encuentralas usando el radar de dragon</div>
+
+<canvas id="radar" width="200" height="200"></canvas>
+
+<script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.153.0/build/three.module.js';
+    import { ARButton } from 'https://unpkg.com/three@0.153.0/examples/jsm/webxr/ARButton.js';
+  
+
+    let dragonBallSet = [];
+    let dragonBalls = [];    
+    let currentBall = 0; 
+
+    let camera, scene, renderer;
+    let reticle, controller;
+    let hitTestSource = null;
+    let hitTestSourceRequested = false;
+    let portalPlaced = false;
+
+    init();
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera();
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.xr.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      // Reticle
+      const ringGeo = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI/2);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      reticle = new THREE.Mesh(ringGeo, ringMat);
+      reticle.matrixAutoUpdate = false;
+      reticle.visible = false;
+      scene.add(reticle);
+
+      // Controller (opcional si quieres tocar para colocar también)
+      controller = renderer.xr.getController(0);
+      controller.addEventListener('select', onSelect);
+      scene.add(controller);
+
+      // ARButton
+      document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    const loader = new GLTFLoader();
+
+    loader.load(
+      './3d_dragon_balls_full_1_to_7_star_set.glb',   // 👈 tu archivo local (mismo directorio que el HTML)
+      gltf => {
+        gltf.scene.traverse(obj => {
+          if (obj.isMesh) {
+            obj.castShadow = true;
+            obj.receiveShadow = true;
+            dragonBallSet.push(obj);
+          }
+        });
+        console.log('Bolas cargadas:', dragonBallSet.length);
+      },
+      xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
+      err => console.error('Error al cargar modelo:', err)
+    );
+
+    function onSelect() {
+      if (reticle.visible && !portalPlaced) {
+        placePortal();
+      }
+    }
+
+
+</script>
+</body>
