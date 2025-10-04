@@ -17,10 +17,10 @@
 <script type="module">
 
   import * as THREE from 'https://esm.run/three@0.164.0';
-import { GLTFLoader  } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
-import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARButton.js';
-import { PMREMGenerator } from 'https://esm.run/three@0.164.0/src/extras/PMREMGenerator.js';
-import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/environments/RoomEnvironment.js';
+  import { GLTFLoader  } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
+  import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARButton.js';
+  import { PMREMGenerator } from 'https://esm.run/three@0.164.0/src/extras/PMREMGenerator.js';
+  import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/environments/RoomEnvironment.js';
 
 
     let dragonBallSet = [];
@@ -71,76 +71,76 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
 
 
     loader.load(
-  'esferas_del_dragon__dragon_balls.glb',
-  gltf => {
-    const root = gltf.scene;
+      'esferas_del_dragon__dragon_balls.glb',
+      gltf => {
+        const root = gltf.scene;
 
 
-     root.traverse(obj => {
-    if (obj.isMesh) {
-      const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
-      if (data) {
-        const [r, g, b] = data.diffuseFactor;
-        obj.material.color.setRGB(r, g, b);
-      }
+      root.traverse(obj => {
+        if (obj.isMesh) {
+          const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
+          if (data) {
+            const [r, g, b] = data.diffuseFactor;
+            obj.material.color.setRGB(r, g, b);
+          }
 
-    obj.material.envMapIntensity = 1.5;
+        obj.material.envMapIntensity = 1.5;
 
-    console.log('Procesando objeto:', obj.name);
-    // Si el nombre del objeto incluye "esfera" o "Sphere", lo tratamos como cuerpo transparente
-    if (obj.isMesh) {
-  const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
-  if (data) {
-    const [r, g, b] = data.diffuseFactor;
-    obj.material.color.setRGB(r, g, b);
-  }
+        console.log('Procesando objeto:', obj.name);
+        // Si el nombre del objeto incluye "esfera" o "Sphere", lo tratamos como cuerpo transparente
+        if (obj.isMesh) {
+          const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
+          if (data) {
+            const [r, g, b] = data.diffuseFactor;
+            obj.material.color.setRGB(r, g, b);
+          }
 
-  obj.material.envMapIntensity = 1.5;
-  obj.castShadow = true;
-  obj.receiveShadow = true;
-  obj.material.needsUpdate = true;
+          obj.material.envMapIntensity = 1.5;
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+          obj.material.needsUpdate = true;
 
-  // 👇 Ajuste de profundidad y orden de render
-  if (/object_5|object_8|object_11|object_14|object_17|object_20|object_23/i.test(obj.name)) {
-    // Esferas (naranjas)
-    obj.material.transparent = true;
-    obj.material.opacity = 0.55;
-    obj.material.depthWrite = false; // No bloquean las estrellas
-    obj.renderOrder = 1; // Se dibujan primero
-  } else {
-    // Estrellas
-    obj.material.depthTest = false;  // no se ocultan por la esfera
-    obj.material.emissive = new THREE.Color(0xff0000); // 🔥 rojo puro
-    obj.material.emissiveIntensity = 6;                // 💡 mucho más brillo
-    obj.material.color.set(0xff3300);                  // color base anaranjado/rojo
-    obj.material.metalness = 0.2;                      // un poco metálico
-    obj.material.roughness = 0.1;                      // superficie brillante
-    obj.material.envMapIntensity = 2.5;                // reflejos más fuertes
-    obj.material.toneMapped = false;                   // evita que el bloom atenúe el rojo
-    obj.renderOrder = 2;
-    obj.material.needsUpdate = true;
-  }
-}
+          // 👇 Ajuste de profundidad y orden de render
+          if (/object_5|object_8|object_11|object_14|object_17|object_20|object_23/i.test(obj.name)) {
+            // Esferas (naranjas)
+            obj.material.transparent = true;
+            obj.material.opacity = 0.55;
+            obj.material.depthWrite = false; // No bloquean las estrellas
+            obj.renderOrder = 1; // Se dibujan primero
+          } else {
+            // Estrellas
+            obj.material.depthTest = false;  // no se ocultan por la esfera
+            obj.material.emissive = new THREE.Color(0xff0000); // 🔥 rojo puro
+            obj.material.emissiveIntensity = 6;                // 💡 mucho más brillo
+            obj.material.color.set(0xff3300);                  // color base anaranjado/rojo
+            obj.material.metalness = 0.2;                      // un poco metálico
+            obj.material.roughness = 0.1;                      // superficie brillante
+            obj.material.envMapIntensity = 2.5;                // reflejos más fuertes
+            obj.material.toneMapped = false;                   // evita que el bloom atenúe el rojo
+            obj.renderOrder = 2;
+            obj.material.needsUpdate = true;
+          }
+        }
 
-    obj.castShadow = true;
-    obj.receiveShadow = true;
-    obj.material.needsUpdate = true;
-  }
-});
-
-    console.log('Modelo cargado:', root);
-
-    root.children[0].children[0].children[0].children.forEach(child => {
-      if (/Estrella/i.test(child.name)) {
-        dragonBallSet.push(child);
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+        obj.material.needsUpdate = true;
       }
     });
 
-    console.log('Total bolas:', dragonBallSet.length); // debería ser 7
-  },
-  xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
-  err => console.error('Error al cargar modelo:', err)
-);
+        console.log('Modelo cargado:', root);
+
+        root.children[0].children[0].children[0].children.forEach(child => {
+          if (/Estrella/i.test(child.name)) {
+            dragonBallSet.push(child);
+          }
+        });
+
+        console.log('Total bolas:', dragonBallSet.length); // debería ser 7
+      },
+      xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
+      err => console.error('Error al cargar modelo:', err)
+    );
 
     function onSelect() {
       if (reticle.visible && !portalPlaced) {
@@ -152,58 +152,130 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // 🔹 Bucle de render y detección de planos
-renderer.setAnimationLoop((timestamp, frame) => {
-  if (frame) {
-    const referenceSpace = renderer.xr.getReferenceSpace();
-    const session = renderer.xr.getSession();
+    // --- RADAR CONFIG ---
+const radarCanvas = document.getElementById('radar');
+const radarCtx = radarCanvas.getContext('2d');
 
-    if (hitTestSourceRequested === false) {
-      session.requestReferenceSpace('viewer').then((refSpace) => {
-        session.requestHitTestSource({ space: refSpace }).then((source) => {
-          hitTestSource = source;
-        });
-      });
-      session.addEventListener('end', () => {
-        hitTestSourceRequested = false;
-        hitTestSource = null;
-      });
-      hitTestSourceRequested = true;
-    }
+// Tamaño y radio del radar
+const radarSize = 200;
+const radarRadius = 80;
 
-    if (hitTestSource) {
-      const hitTestResults = frame.getHitTestResults(hitTestSource);
-      if (hitTestResults.length) {
-        const hit = hitTestResults[0];
-        const pose = hit.getPose(referenceSpace);
-        reticle.visible = true;
-        reticle.matrix.fromArray(pose.transform.matrix);
-      } else {
-        reticle.visible = false;
-      }
-    }
+// Actualiza radar en cada frame
+function updateRadar() {
+  radarCtx.clearRect(0, 0, radarSize, radarSize);
+
+  // Fondo del radar
+  radarCtx.fillStyle = 'rgba(0, 60, 0, 0.8)';
+  radarCtx.beginPath();
+  radarCtx.arc(radarSize/2, radarSize/2, radarRadius, 0, Math.PI * 2);
+  radarCtx.fill();
+
+  // Rejilla
+  radarCtx.strokeStyle = 'rgba(0,255,0,0.3)';
+  radarCtx.lineWidth = 1;
+  for (let r = 20; r <= radarRadius; r += 20) {
+    radarCtx.beginPath();
+    radarCtx.arc(radarSize/2, radarSize/2, r, 0, Math.PI * 2);
+    radarCtx.stroke();
   }
 
-  renderer.render(scene, camera);
-});
+  // Línea dirección (frente del jugador)
+  radarCtx.strokeStyle = 'rgba(0,255,0,0.6)';
+  radarCtx.beginPath();
+  radarCtx.moveTo(radarSize/2, radarSize/2);
+  radarCtx.lineTo(radarSize/2, radarSize/2 - radarRadius);
+  radarCtx.stroke();
 
-// 🔹 Colocar una bola cuando se toca
-function placePortal() {
-   if (dragonBallSet.length === 0) return;
+  // --- Dibuja bolas ---
+  const playerPos = new THREE.Vector3();
+  camera.getWorldPosition(playerPos);
 
-  const original = dragonBallSet[currentBall];
-  const ball = original.clone(true); // 👈 clona todo el grupo
-  ball.scale.set(0.1, 0.1, 0.1);
+  dragonBalls.forEach(ball => {
+    const ballPos = new THREE.Vector3();
+    ball.getWorldPosition(ballPos);
 
-  const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
-  ball.position.copy(pos);
+    // vector relativo
+    const relative = ballPos.clone().sub(playerPos);
 
-  scene.add(ball);
-  dragonBalls.push(ball);
+    // rotar según orientación del jugador
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const angle = Math.atan2(
+      relative.x * forward.z - relative.z * forward.x,
+      relative.x * forward.x + relative.z * forward.z
+    );
 
-  console.log(`Colocada la bola ${currentBall + 1}⭐`);
-  currentBall = (currentBall + 1) % dragonBallSet.length;
+    const dist = Math.min(relative.length() * 2, radarRadius); // escala de distancia
+    const x = radarSize/2 + Math.sin(angle) * dist;
+    const y = radarSize/2 - Math.cos(angle) * dist;
+
+    radarCtx.fillStyle = 'rgb(255,165,0)'; // naranja
+    radarCtx.beginPath();
+    radarCtx.arc(x, y, 6, 0, Math.PI * 2);
+    radarCtx.fill();
+
+    radarCtx.strokeStyle = 'rgba(255,255,0,0.7)';
+    radarCtx.stroke();
+  });
+
+  // Punto central (jugador)
+  radarCtx.fillStyle = 'lime';
+  radarCtx.beginPath();
+  radarCtx.arc(radarSize/2, radarSize/2, 4, 0, Math.PI * 2);
+  radarCtx.fill();
 }
+
+    // 🔹 Bucle de render y detección de planos
+    renderer.setAnimationLoop((timestamp, frame) => {
+      if (frame) {
+        const referenceSpace = renderer.xr.getReferenceSpace();
+        const session = renderer.xr.getSession();
+
+        if (hitTestSourceRequested === false) {
+          session.requestReferenceSpace('viewer').then((refSpace) => {
+            session.requestHitTestSource({ space: refSpace }).then((source) => {
+              hitTestSource = source;
+            });
+          });
+          session.addEventListener('end', () => {
+            hitTestSourceRequested = false;
+            hitTestSource = null;
+          });
+          hitTestSourceRequested = true;
+        }
+
+        if (hitTestSource) {
+          const hitTestResults = frame.getHitTestResults(hitTestSource);
+          if (hitTestResults.length) {
+            const hit = hitTestResults[0];
+            const pose = hit.getPose(referenceSpace);
+            reticle.visible = true;
+            reticle.matrix.fromArray(pose.transform.matrix);
+          } else {
+            reticle.visible = false;
+          }
+        }
+      }
+
+      updateRadar();
+      renderer.render(scene, camera);
+    });
+
+  function placePortal() {
+    if (dragonBallSet.length === 0) return;
+
+    const original = dragonBallSet[currentBall];
+    const ball = original.clone(true); // 👈 clona todo el grupo
+    ball.scale.set(0.1, 0.1, 0.1);
+
+    const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
+    ball.position.copy(pos);
+
+    scene.add(ball);
+    dragonBalls.push(ball);
+
+    console.log(`Colocada la bola ${currentBall + 1}⭐`);
+    currentBall = (currentBall + 1) % dragonBallSet.length;
+  }
 
 
 </script>
