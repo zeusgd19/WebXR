@@ -75,40 +75,53 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
   gltf => {
     const root = gltf.scene;
 
+    // Ajustar materiales generales
+    root.traverse(obj => {
+      if (obj.isMesh) {
+        const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
+        if (data) {
+          const [r, g, b] = data.diffuseFactor;
+          obj.material.color.setRGB(r, g, b);
+        }
 
-     root.traverse(obj => {
-  if (obj.isMesh) {
-    const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
-    if (data) {
-      const [r, g, b] = data.diffuseFactor;
-      obj.material.color.setRGB(r, g, b);
-    }
-
-    obj.material.envMapIntensity = 1.5;
-
-    // Si el nombre del objeto incluye "esfera" o "Sphere", lo tratamos como cuerpo transparente
-    if (obj.name.toLowerCase().includes("estrella") || obj.name.toLowerCase().includes("sphere")) {
-      obj.material.transparent = true;
-      obj.material.opacity = 0.85;
-      obj.material.depthWrite = false;   // ✅ evita ocultar las estrellas
-      obj.renderOrder = 1;               // ✅ dibuja antes las estrellas
-    }
-
-    obj.castShadow = true;
-    obj.receiveShadow = true;
-    obj.material.needsUpdate = true;
-  }
-});
-
-    console.log('Modelo cargado:', root);
-
-    root.children[0].children[0].children[0].children.forEach(child => {
-      if (/Estrella/i.test(child.name)) {
-        dragonBallSet.push(child);
+        obj.material.envMapIntensity = 1.5;
+        obj.material.needsUpdate = true;
+        obj.castShadow = true;
+        obj.receiveShadow = true;
       }
     });
 
-    console.log('Total bolas:', dragonBallSet.length); // debería ser 7
+    const allObjects = root.children[0].children[0].children[0].children;
+    console.log("Total objetos en modelo:", allObjects.length);
+
+    // Agrupar por patrón: esfera = 5, 8, 11, 14, 17, 20, 23
+    for (let i = 0; i < allObjects.length; i++) {
+      if ((i - 5) % 3 === 0 && i >= 5) {
+        const group = new THREE.Group();
+
+        const star1 = allObjects[i - 1]; // estrella justo antes
+        const sphere = allObjects[i];    // la esfera
+
+        // aplicar propiedades de visualización
+        if (sphere.isMesh) {
+          sphere.material.transparent = true;
+          sphere.material.opacity = 0.85;
+          sphere.material.depthWrite = false;
+          sphere.renderOrder = 1;
+        }
+
+        if (star1 && star1.isMesh) {
+          star1.material.depthTest = false;
+          star1.renderOrder = 2;
+        }
+
+        group.add(star1.clone());
+        group.add(sphere.clone());
+        dragonBallSet.push(group);
+      }
+    }
+
+    console.log('Bolas agrupadas:', dragonBallSet.length); // debería dar 7
   },
   xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
   err => console.error('Error al cargar modelo:', err)
