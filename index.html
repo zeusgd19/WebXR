@@ -76,21 +76,14 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
 
 
     root.traverse(obj => {
-  if (obj.isMesh) {
-    // aplicar entorno para que el material refleje
-    obj.material.envMapIntensity = 1.5;
+      if (obj.isMesh) {
+        // conservar su material original
+        obj.material.envMapIntensity = 1.5;
 
-    // si quieres que la esfera se vea un poco translúcida
-    if (obj.name.toLowerCase().includes("estrella")) {
-      obj.material.transparent = true;
-      obj.material.opacity = 0.9;
-      obj.material.side = THREE.DoubleSide;
+        obj.castShadow = true;
+        obj.receiveShadow = true;
     }
-
-    obj.castShadow = true;
-    obj.receiveShadow = true;
-  }
-});
+  });
 
     console.log('Modelo cargado:', root);
 
