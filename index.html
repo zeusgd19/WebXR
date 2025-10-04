@@ -65,20 +65,29 @@ import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARBut
     const loader = new GLTFLoader();
 
     loader.load(
-      'esferas_del_dragon__dragon_balls.glb',   // 👈 tu archivo local (mismo directorio que el HTML)
-      gltf => {
-        gltf.scene.traverse(obj => {
-          if (obj.isMesh) {
-            obj.castShadow = true;
-            obj.receiveShadow = true;
-            dragonBallSet.push(obj);
-          }
-        });
-        console.log('Bolas cargadas:', dragonBallSet.length);
-      },
-      xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
-      err => console.error('Error al cargar modelo:', err)
-    );
+  '3d_dragon_balls__full_1_to_7_star_set.glb',
+  gltf => {
+    gltf.scene.traverse(obj => {
+      if (obj.isMesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+    });
+
+    // Agrupar bolas por cada "raíz"
+    gltf.scene.children.forEach(child => {
+      if (child.children.length > 0) {
+        const group = new THREE.Group();
+        child.children.forEach(sub => group.add(sub.clone()));
+        dragonBallSet.push(group);
+      }
+    });
+
+    console.log('Bolas agrupadas:', dragonBallSet.length); // debería dar 7
+  },
+  xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
+  err => console.error('Error al cargar modelo:', err)
+);
 
     function onSelect() {
       if (reticle.visible && !portalPlaced) {
