@@ -17,7 +17,8 @@
 <script type="module">
 
   import * as THREE from 'https://esm.run/three@0.164.0';
-import { GLTFLoader } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader  } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
+import { KHRMaterialsPbrSpecularGlossiness } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
 import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARButton.js';
 import { PMREMGenerator } from 'https://esm.run/three@0.164.0/src/extras/PMREMGenerator.js';
 import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/environments/RoomEnvironment.js';
@@ -68,6 +69,7 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
     }
 
     const loader = new GLTFLoader();
+    loader.register(parser => new KHRMaterialsPbrSpecularGlossiness(parser));
 
     loader.load(
   'esferas_del_dragon__dragon_balls.glb',
@@ -75,15 +77,13 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
     const root = gltf.scene;
 
 
-    root.traverse(obj => {
+     root.traverse(obj => {
       if (obj.isMesh) {
-        // conservar su material original
-        obj.material.envMapIntensity = 1.5;
-
+        obj.material.envMapIntensity = 2;
         obj.castShadow = true;
         obj.receiveShadow = true;
-    }
-  });
+      }
+    });
 
     console.log('Modelo cargado:', root);
 
