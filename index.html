@@ -15,11 +15,10 @@
 <canvas id="radar" width="200" height="200"></canvas>
 
 <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.module.js';
-    import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/webxr/ARButton.js';
 
-    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
-  
+  import * as THREE from 'https://esm.run/three@0.164.0';
+import { GLTFLoader } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
+import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARButton.js';
 
     let dragonBallSet = [];
     let dragonBalls = [];    
@@ -66,7 +65,7 @@
     const loader = new GLTFLoader();
 
     loader.load(
-      './3d_dragon_balls_full_1_to_7_star_set.glb',   // 👈 tu archivo local (mismo directorio que el HTML)
+      '3d_dragon_balls__full_1_to_7_star_set.glb',   // 👈 tu archivo local (mismo directorio que el HTML)
       gltf => {
         gltf.scene.traverse(obj => {
           if (obj.isMesh) {
@@ -90,6 +89,57 @@
     function onWindowResize() {
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
+
+    // 🔹 Bucle de render y detección de planos
+renderer.setAnimationLoop((timestamp, frame) => {
+  if (frame) {
+    const referenceSpace = renderer.xr.getReferenceSpace();
+    const session = renderer.xr.getSession();
+
+    if (hitTestSourceRequested === false) {
+      session.requestReferenceSpace('viewer').then((refSpace) => {
+        session.requestHitTestSource({ space: refSpace }).then((source) => {
+          hitTestSource = source;
+        });
+      });
+      session.addEventListener('end', () => {
+        hitTestSourceRequested = false;
+        hitTestSource = null;
+      });
+      hitTestSourceRequested = true;
+    }
+
+    if (hitTestSource) {
+      const hitTestResults = frame.getHitTestResults(hitTestSource);
+      if (hitTestResults.length) {
+        const hit = hitTestResults[0];
+        const pose = hit.getPose(referenceSpace);
+        reticle.visible = true;
+        reticle.matrix.fromArray(pose.transform.matrix);
+      } else {
+        reticle.visible = false;
+      }
+    }
+  }
+
+  renderer.render(scene, camera);
+});
+
+// 🔹 Colocar una bola cuando se toca
+function placePortal() {
+  if (dragonBallSet.length === 0) return;
+
+  const original = dragonBallSet[currentBall];
+  const ball = original.clone();
+  ball.scale.set(0.05, 0.05, 0.05);
+  ball.position.setFromMatrixPosition(reticle.matrix);
+
+  scene.add(ball);
+  dragonBalls.push(ball);
+  console.log(`Bola ${currentBall + 1} colocada ⭐`);
+
+  currentBall = (currentBall + 1) % dragonBallSet.length;
+}
 
 
 </script>
