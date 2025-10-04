@@ -109,10 +109,16 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
     obj.renderOrder = 1; // Se dibujan primero
   } else {
     // Estrellas
-    obj.material.depthTest = false;  // No se ocultan por la esfera
-    obj.material.emissive = new THREE.Color(0xff4500); // 🔥 color brillante anaranjado
-    obj.material.emissiveIntensity = 3;
-    obj.renderOrder = 2;             // Se dibujan después
+    obj.material.depthTest = false;  // no se ocultan por la esfera
+    obj.material.emissive = new THREE.Color(0xff0000); // 🔥 rojo puro
+    obj.material.emissiveIntensity = 6;                // 💡 mucho más brillo
+    obj.material.color.set(0xff3300);                  // color base anaranjado/rojo
+    obj.material.metalness = 0.2;                      // un poco metálico
+    obj.material.roughness = 0.1;                      // superficie brillante
+    obj.material.envMapIntensity = 2.5;                // reflejos más fuertes
+    obj.material.toneMapped = false;                   // evita que el bloom atenúe el rojo
+    obj.renderOrder = 2;
+    obj.material.needsUpdate = true;
   }
 }
 
