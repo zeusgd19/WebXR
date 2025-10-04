@@ -7,12 +7,34 @@
   <style>
     body { margin:0; overflow:hidden; font-family:sans-serif; }
     #info { position: absolute; top: 10px; left: 10px; color: white; z-index: 2; }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* deja pasar toques al entorno AR */
+    }
+
+
+    #radar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(0, 30, 0, 0.6);
+      border: 2px solid #0f0;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
-<div id="info">Ancla las bolas de dragon en algun punto del entorno y encuentralas usando el radar de dragon</div>
-
-<canvas id="radar" width="200" height="200"></canvas>
+<div id="overlay">
+    <canvas id="radar" width="200" height="200"></canvas>
+</div>
 
 <script type="module">
 
@@ -62,7 +84,10 @@
       scene.add(controller);
 
       // ARButton
-      document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+      document.body.appendChild(ARButton.createButton(renderer, {
+        requiredFeatures: ['hit-test', 'dom-overlay'],
+        domOverlay: { root: document.getElementById('overlay') }
+      }));
 
       window.addEventListener('resize', onWindowResize);
     }
