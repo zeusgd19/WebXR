@@ -104,12 +104,14 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
   if (/object_5|object_8|object_11|object_14|object_17|object_20|object_23/i.test(obj.name)) {
     // Esferas (naranjas)
     obj.material.transparent = true;
-    obj.material.opacity = 0.85;
+    obj.material.opacity = 0.55;
     obj.material.depthWrite = false; // No bloquean las estrellas
     obj.renderOrder = 1; // Se dibujan primero
   } else {
     // Estrellas
     obj.material.depthTest = false;  // No se ocultan por la esfera
+    obj.material.emissive = new THREE.Color(0xff4500); // 🔥 color brillante anaranjado
+    obj.material.emissiveIntensity = 1.5;
     obj.renderOrder = 2;             // Se dibujan después
   }
 }
