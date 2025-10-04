@@ -65,25 +65,29 @@ import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARBut
     const loader = new GLTFLoader();
 
     loader.load(
-      'esferas_del_dragon__dragon_balls.glb',
-      gltf => {
-        gltf.scene.traverse(obj => {
-          if (obj.isMesh) {
-            obj.castShadow = true;
-            obj.receiveShadow = true;
-          }
-        });
+  'esferas_del_dragon__dragon_balls.glb',
+  gltf => {
+    const root = gltf.scene;
 
-        // Agrupar bolas por cada "raíz"
-        gltf.scene.children.forEach(child => {
-          if (child.children.length > 0) {
-            const group = new THREE.Group();
-            child.children.forEach(sub => group.add(sub.clone()));
-            dragonBallSet.push(group);
-          }
+    root.traverse(obj => {
+      if (obj.isMesh) {
+        obj.material.transparent = true;
+        obj.material.opacity = 0.9;   // un poco translúcido
+        obj.material.side = THREE.DoubleSide; 
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
     });
 
-    console.log('Bolas agrupadas:', dragonBallSet.length); // debería dar 7
+    console.log('Modelo cargado:', root);
+
+    root.children[0].children[0].children[0].children.forEach(child => {
+      if (/Estrella/i.test(child.name)) {
+        dragonBallSet.push(child);
+      }
+    });
+
+    console.log('Total bolas:', dragonBallSet.length); // debería ser 7
   },
   xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado'),
   err => console.error('Error al cargar modelo:', err)
@@ -136,17 +140,19 @@ renderer.setAnimationLoop((timestamp, frame) => {
 
 // 🔹 Colocar una bola cuando se toca
 function placePortal() {
-  if (dragonBallSet.length === 0) return;
+   if (dragonBallSet.length === 0) return;
 
   const original = dragonBallSet[currentBall];
-  const ball = original.clone();
-  ball.scale.set(0.05, 0.05, 0.05);
-  ball.position.setFromMatrixPosition(reticle.matrix);
+  const ball = original.clone(true); // 👈 clona todo el grupo
+  ball.scale.set(0.1, 0.1, 0.1);
+
+  const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
+  ball.position.copy(pos);
 
   scene.add(ball);
   dragonBalls.push(ball);
-  console.log(`Bola ${currentBall + 1} colocada ⭐`);
 
+  console.log(`Colocada la bola ${currentBall + 1}⭐`);
   currentBall = (currentBall + 1) % dragonBallSet.length;
 }
 
