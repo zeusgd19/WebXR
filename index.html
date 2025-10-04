@@ -85,6 +85,17 @@ import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/envi
     }
 
     obj.material.envMapIntensity = 1.5;
+
+    // Si el nombre del objeto incluye "esfera" o "Sphere", lo tratamos como cuerpo transparente
+    if (obj.name.toLowerCase().includes("esfera") || obj.name.toLowerCase().includes("sphere")) {
+      obj.material.transparent = true;
+      obj.material.opacity = 0.85;
+      obj.material.depthWrite = false;   // ✅ evita ocultar las estrellas
+      obj.renderOrder = 1;               // ✅ dibuja antes las estrellas
+    }
+
+    obj.castShadow = true;
+    obj.receiveShadow = true;
     obj.material.needsUpdate = true;
   }
 });
