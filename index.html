@@ -86,6 +86,7 @@
       // ARButton
       document.body.appendChild(ARButton.createButton(renderer, {
         requiredFeatures: ['hit-test', 'dom-overlay'],
+        // Anadir el radar en el modo AR
         domOverlay: { root: document.getElementById('overlay') }
       }));
 
@@ -112,7 +113,6 @@
         obj.material.envMapIntensity = 1.5;
 
         console.log('Procesando objeto:', obj.name);
-        // Si el nombre del objeto incluye "esfera" o "Sphere", lo tratamos como cuerpo transparente
         if (obj.isMesh) {
           const data = obj.material.userData.gltfExtensions?.KHR_materials_pbrSpecularGlossiness;
           if (data) {
@@ -125,15 +125,14 @@
           obj.receiveShadow = true;
           obj.material.needsUpdate = true;
 
-          // 👇 Ajuste de profundidad y orden de render
+          // Esferas
           if (/object_5|object_8|object_11|object_14|object_17|object_20|object_23/i.test(obj.name)) {
-            // Esferas (naranjas)
             obj.material.transparent = true;
             obj.material.opacity = 0.55;
             obj.material.depthWrite = false; // No bloquean las estrellas
             obj.renderOrder = 1; // Se dibujan primero
+          // Estrellas
           } else {
-            // Estrellas
             obj.material.depthTest = false;  // no se ocultan por la esfera
             obj.material.emissive = new THREE.Color(0xff0000); // 🔥 rojo puro
             obj.material.emissiveIntensity = 6;                // 💡 mucho más brillo
@@ -249,7 +248,6 @@ function updateRadar() {
   radarCtx.fill();
 }
 
-    // 🔹 Bucle de render y detección de planos
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame) {
         const referenceSpace = renderer.xr.getReferenceSpace();
@@ -289,7 +287,7 @@ function updateRadar() {
     if (dragonBallSet.length === 0) return;
 
     const original = dragonBallSet[currentBall];
-    const ball = original.clone(true); // 👈 clona todo el grupo
+    const ball = original.clone(true);
     ball.scale.set(0.1, 0.1, 0.1);
 
     const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
@@ -298,7 +296,7 @@ function updateRadar() {
     scene.add(ball);
     dragonBalls.push(ball);
 
-    console.log(`Colocada la bola ${currentBall + 1}⭐`);
+    console.log(`Colocada la bola ${currentBall + 1}`);
     currentBall = (currentBall + 1) % dragonBallSet.length;
   }
 
