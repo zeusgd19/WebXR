@@ -19,6 +19,9 @@
   import * as THREE from 'https://esm.run/three@0.164.0';
 import { GLTFLoader } from 'https://esm.run/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
 import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARButton.js';
+import { PMREMGenerator } from 'https://esm.run/three@0.164.0/src/extras/PMREMGenerator.js';
+import { RoomEnvironment } from 'https://esm.run/three@0.164.0/examples/jsm/environments/RoomEnvironment.js';
+
 
     let dragonBallSet = [];
     let dragonBalls = [];    
@@ -36,6 +39,8 @@ import { ARButton } from 'https://esm.run/three@0.164.0/examples/jsm/webxr/ARBut
       camera = new THREE.PerspectiveCamera();
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      const pmremGenerator = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.xr.enabled = true;
       document.body.appendChild(renderer.domElement);
