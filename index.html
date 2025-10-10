@@ -169,7 +169,7 @@
     );
 
     function onSelect() {
-      if (reticle.visible && !portalPlaced) {
+      if (reticle.visible) {
         placePortal();
       }
     }
@@ -322,27 +322,35 @@ function updateRadar() {
     });
 
   function placePortal() {
-    if (dragonBallSet.length === 0) return;
+  if (dragonBallSet.length === 0) return;
 
-    const original = dragonBallSet[currentBall];
-    const ball = original.clone(true);
-    ball.scale.set(0.1, 0.1, 0.1);
+  const original = dragonBallSet[currentBall];
+  const ball = original.clone(true);
 
-    const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
-    ball.position.copy(pos);
-
-
-    if(dragonBalls.length >= 7){
-      const oldBall = dragonBalls.shift();
-      scene.remove(oldBall);
+  // 🔁 Clonar materiales individuales para que no se compartan entre bolas
+  ball.traverse(child => {
+    if (child.isMesh && child.material) {
+      child.material = child.material.clone();
     }
+  });
 
-    scene.add(ball);
-    dragonBalls.push(ball);
+  ball.scale.set(0.1, 0.1, 0.1);
 
-    console.log(`Colocada la bola ${currentBall + 1}`);
-    currentBall = (currentBall + 1) % dragonBallSet.length;
+  const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
+  ball.position.copy(pos);
+
+  // mantener máximo 7 bolas
+  if (dragonBalls.length >= 7) {
+    const oldBall = dragonBalls.shift();
+    scene.remove(oldBall);
   }
+
+  scene.add(ball);
+  dragonBalls.push(ball);
+
+  console.log(`Colocada la bola ${currentBall + 1}`);
+  currentBall = (currentBall + 1) % dragonBallSet.length;
+}
 
 
 </script>
