@@ -78,7 +78,10 @@
     let portalPlaced = false;
 
     const captureSound = new Audio('capture.wav');
+    const shenronSound = new Audio('shenron_sound.mp3');
     let capturedCount = 0;
+    let shenronLoaded = false;
+    let shenronModel = null;
 
     init();
     function init() {
@@ -372,6 +375,11 @@ function updateRadar() {
               console.log('Bola capturada! Quedan:', dragonBalls.length);
               capturedCount++;
               document.getElementById('counter').innerText = `Bolas capturadas: ${capturedCount}`;
+
+              if (capturedCount === 7 && !shenronLoaded) {
+                shenronLoaded = true;
+                showShenron();
+              }
             }
           }, 50);
         }
@@ -380,6 +388,72 @@ function updateRadar() {
       updateRadar();
       renderer.render(scene, camera);
     });
+
+  function showShenron() {
+  console.log("¡Has reunido las 7 esferas del dragón!");
+
+  const loader = new GLTFLoader();
+  loader.load(
+    'shenron_dragon_ball.glb', // <-- asegúrate de tener este archivo en la misma carpeta
+    gltf => {
+      shenronModel = gltf.scene;
+
+      // Ajustar tamaño y posición
+      shenronModel.scale.set(0.5, 0.5, 0.5);
+      shenronModel.position.set(0, 0, -2); // un poco delante de la cámara
+
+      // Animación inicial (aparecer desde abajo)
+      shenronModel.traverse(obj => {
+        if (obj.isMesh) {
+          obj.material.transparent = true;
+          obj.material.opacity = 0;
+        }
+      });
+
+      scene.add(shenronModel);
+      shenronSound.currentTime = 0;
+      shenronSound.play();
+
+      // Efecto de aparición progresiva
+      let opacity = 0;
+      const fadeIn = setInterval(() => {
+        opacity += 0.05;
+        shenronModel.traverse(obj => {
+          if (obj.isMesh) obj.material.opacity = Math.min(opacity, 1);
+        });
+
+        if (opacity >= 1) clearInterval(fadeIn);
+      }, 80);
+
+      // Mensaje en pantalla
+      const msg = document.createElement('div');
+      msg.id = 'shenronMessage';
+      msg.innerText = '¡Has reunido las 7 esferas del dragón!';
+      msg.style.position = 'absolute';
+      msg.style.top = '50%';
+      msg.style.left = '50%';
+      msg.style.transform = 'translate(-50%, -50%)';
+      msg.style.color = '#0f0';
+      msg.style.fontSize = '22px';
+      msg.style.fontWeight = 'bold';
+      msg.style.textShadow = '0 0 10px #0f0';
+      msg.style.background = 'rgba(0,0,0,0.5)';
+      msg.style.padding = '12px 20px';
+      msg.style.border = '2px solid #0f0';
+      msg.style.borderRadius = '8px';
+      msg.style.zIndex = '10000';
+      document.body.appendChild(msg);
+
+      // Desaparecer mensaje después de unos segundos
+      setTimeout(() => {
+        msg.remove();
+      }, 6000);
+    },
+    xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado Shenron'),
+    err => console.error('Error al cargar Shenron:', err)
+  );
+}
+
 
   function placePortal() {
   if (dragonBallSet.length === 0) return;
