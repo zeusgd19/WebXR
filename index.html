@@ -399,8 +399,8 @@ function updateRadar() {
       shenronModel = gltf.scene;
 
       // Ajustar tamaño y posición
-      shenronModel.scale.set(0.5, 0.5, 0.5);
-      shenronModel.position.set(0, 0, -2); // un poco delante de la cámara
+      shenronModel.scale.set(0.05, 0.05, 0.05);
+      shenronModel.position.set(0, -0.5, -1.5); // un poco delante de la cámara
 
       // Animación inicial (aparecer desde abajo)
       shenronModel.traverse(obj => {
@@ -442,12 +442,13 @@ function updateRadar() {
       msg.style.border = '2px solid #0f0';
       msg.style.borderRadius = '8px';
       msg.style.zIndex = '10000';
-      document.body.appendChild(msg);
+      msg.style.opacity = 0;
+      msg.style.transition = 'opacity 1s';
+      document.getElementById('overlay').appendChild(msg);
 
       // Desaparecer mensaje después de unos segundos
-      setTimeout(() => {
-        msg.remove();
-      }, 6000);
+      setTimeout(() => { msg.style.opacity = 1; }, 100); // fade-in
+      setTimeout(() => { msg.style.opacity = 0; msg.remove(); }, 6000);
     },
     xhr => console.log((xhr.loaded / xhr.total * 100) + '% cargado Shenron'),
     err => console.error('Error al cargar Shenron:', err)
