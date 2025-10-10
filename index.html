@@ -190,7 +190,7 @@ const radarRadius = 80;
 function updateRadar() {
   radarCtx.clearRect(0, 0, radarSize, radarSize);
 
-  // Fondo del radar
+  // Fondo
   radarCtx.fillStyle = 'rgba(0, 60, 0, 0.8)';
   radarCtx.beginPath();
   radarCtx.arc(radarSize/2, radarSize/2, radarRadius, 0, Math.PI * 2);
@@ -205,50 +205,85 @@ function updateRadar() {
     radarCtx.stroke();
   }
 
-  // Línea dirección (frente del jugador)
+  // Jugador (centro)
+  const playerPos = new THREE.Vector3();
+  camera.getWorldPosition(playerPos);
+
+  // Calcular posiciones relativas de todas las bolas
+  const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  let closestBall = null;
+  let closestDist = Infinity;
+  const ballData = [];
+
+  dragonBalls.forEach(ball => {
+    const ballPos = new THREE.Vector3();
+    ball.getWorldPosition(ballPos);
+    const relative = ballPos.clone().sub(playerPos);
+
+    const angle = Math.atan2(
+      relative.x * forward.z - relative.z * forward.x,
+      relative.x * forward.x + relative.z * forward.z
+    );
+
+    const dist = relative.length();
+    ballData.push({ angle, dist });
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestBall = { angle, dist };
+    }
+  });
+
+  // Dibuja todas las bolas (puntos naranjas)
+  ballData.forEach(({ angle, dist }) => {
+    const scaledDist = Math.min(dist * 2, radarRadius);
+    const x = radarSize / 2 + Math.sin(angle) * scaledDist;
+    const y = radarSize / 2 - Math.cos(angle) * scaledDist;
+
+    radarCtx.fillStyle = 'rgb(255,165,0)';
+    radarCtx.beginPath();
+    radarCtx.arc(x, y, 6, 0, Math.PI * 2);
+    radarCtx.fill();
+    radarCtx.strokeStyle = 'rgba(255,255,0,0.7)';
+    radarCtx.stroke();
+  });
+
+  // Triángulo indicador hacia la bola más cercana
+  if (closestBall) {
+    const dirAngle = closestBall.angle;
+    const scaledDist = Math.min(closestBall.dist * 2, radarRadius - 10);
+
+    const cx = radarSize / 2 + Math.sin(dirAngle) * scaledDist;
+    const cy = radarSize / 2 - Math.cos(dirAngle) * scaledDist;
+
+    radarCtx.fillStyle = 'lime';
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx, cy);
+    radarCtx.lineTo(
+      cx - 6 * Math.cos(dirAngle - Math.PI / 2),
+      cy - 6 * Math.sin(dirAngle - Math.PI / 2)
+    );
+    radarCtx.lineTo(
+      cx - 6 * Math.cos(dirAngle + Math.PI / 2),
+      cy - 6 * Math.sin(dirAngle + Math.PI / 2)
+    );
+    radarCtx.closePath();
+    radarCtx.fill();
+  }
+
+  // Línea frontal del jugador
   radarCtx.strokeStyle = 'rgba(0,255,0,0.6)';
   radarCtx.beginPath();
   radarCtx.moveTo(radarSize/2, radarSize/2);
   radarCtx.lineTo(radarSize/2, radarSize/2 - radarRadius);
   radarCtx.stroke();
 
-  // --- Dibuja bolas ---
-  const playerPos = new THREE.Vector3();
-  camera.getWorldPosition(playerPos);
-
-  dragonBalls.forEach(ball => {
-    const ballPos = new THREE.Vector3();
-    ball.getWorldPosition(ballPos);
-
-    // vector relativo
-    const relative = ballPos.clone().sub(playerPos);
-
-    // rotar según orientación del jugador
-    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-    const angle = Math.atan2(
-      relative.x * forward.z - relative.z * forward.x,
-      relative.x * forward.x + relative.z * forward.z
-    );
-
-    const dist = Math.min(relative.length() * 2, radarRadius); // escala de distancia
-    const x = radarSize/2 + Math.sin(angle) * dist;
-    const y = radarSize/2 - Math.cos(angle) * dist;
-
-    radarCtx.fillStyle = 'rgb(255,165,0)'; // naranja
-    radarCtx.beginPath();
-    radarCtx.arc(x, y, 6, 0, Math.PI * 2);
-    radarCtx.fill();
-
-    radarCtx.strokeStyle = 'rgba(255,255,0,0.7)';
-    radarCtx.stroke();
-  });
-
-  // Punto central (jugador)
+  // Punto del jugador
   radarCtx.fillStyle = 'lime';
   radarCtx.beginPath();
   radarCtx.arc(radarSize/2, radarSize/2, 4, 0, Math.PI * 2);
   radarCtx.fill();
 }
+
 
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame) {
