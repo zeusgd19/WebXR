@@ -8,13 +8,26 @@
     body { margin:0; overflow:hidden; font-family:sans-serif; }
     #info { position: absolute; top: 10px; left: 10px; color: white; z-index: 2; }
 
-    #overlay {
+    .overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none; /* deja pasar toques al entorno AR */
+    }
+
+    #counter {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #0f0;
+      font-size: 18px;
+      border: 2px solid #0f0;
+      border-radius: 8px;
+      z-index: 9999;
     }
 
 
@@ -32,8 +45,13 @@
   </style>
 </head>
 <body>
-<div id="overlay">
+<div class="overlay">
     <canvas id="radar" width="200" height="200"></canvas>
+</div>
+
+<div class="overlay">
+  <div id="counter">
+  </div>
 </div>
 
 <script type="module">
@@ -347,6 +365,7 @@ function updateRadar() {
               captureSound.currentTime = 0;
               captureSound.play();
               console.log('Bola capturada! Quedan:', dragonBalls.length);
+              document.getElementById('counter').innerText = `Bolas capturadas: ${7 - dragonBalls.length}`;
             }
           }, 50);
         }
