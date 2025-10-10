@@ -8,7 +8,7 @@
     body { margin:0; overflow:hidden; font-family:sans-serif; }
     #info { position: absolute; top: 10px; left: 10px; color: white; z-index: 2; }
 
-    .overlay {
+    #overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -45,11 +45,11 @@
   </style>
 </head>
 <body>
-<div class="overlay">
+<div id="overlay">
     <canvas id="radar" width="200" height="200"></canvas>
 </div>
 
-<div class="overlay">
+<div id="overlay">
   <div id="counter">
     Bolas capturadas: 0
   </div>
@@ -108,7 +108,7 @@
       document.body.appendChild(ARButton.createButton(renderer, {
         requiredFeatures: ['hit-test', 'dom-overlay'],
         // Anadir el radar en el modo AR
-        domOverlay: { root: document.getElementsByClassName('overlay') }
+        domOverlay: { root: document.getElementById('overlay') }
       }));
 
       window.addEventListener('resize', onWindowResize);
