@@ -17,6 +17,14 @@
       pointer-events: none; /* deja pasar toques al entorno AR */
     }
 
+    .overlay-ui {
+      position: absolute;
+      color: #0f0;
+      font-size: 18px;
+      font-family: sans-serif;
+      pointer-events: none;
+    }
+
     #counter {
       position: absolute;
       top: 20px;
@@ -47,12 +55,7 @@
 <body>
 <div id="overlay">
     <canvas id="radar" width="200" height="200"></canvas>
-</div>
-
-<div id="overlay">
-  <div id="counter">
-    Bolas capturadas: 0
-  </div>
+    <div id="counter" class="overlay-ui">Bolas capturadas: 0</div>
 </div>
 
 <script type="module">
