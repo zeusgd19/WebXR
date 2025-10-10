@@ -55,6 +55,8 @@
     let hitTestSourceRequested = false;
     let portalPlaced = false;
 
+    const captureSound = new Audio('capture.wav');
+
     init();
     function init() {
       scene = new THREE.Scene();
@@ -276,6 +278,36 @@ function updateRadar() {
           } else {
             reticle.visible = false;
           }
+        }
+      }
+
+      const playerPos = new THREE.Vector3();
+      camera.getWorldPosition(playerPos);
+
+      for(let i = dragonBalls.length - 1; i >= 0; i--) {
+        const ball = dragonBalls[i];
+        const ballPos = new THREE.Vector3();
+        ball.getWorldPosition(ballPos);
+
+        const distance = playerPos.distanceTo(ballPos);
+        if (distance < 0.4) { // distancia de captura
+          const mat = ball.material;
+
+          if(!mat.trasparent) mat.transparent = true;
+          let opacity = mat.opacity || 1
+
+          const fade = setInterval(() => {
+            opacity -= 0.1;
+            mat.opacity = Math.max(opacity, 0);
+            if (mat.opacity <= 0) {
+              clearInterval(fade);
+              scene.remove(ball);
+              dragonBalls.splice(i, 1);
+              captureSound.currentTime = 0;
+              captureSound.play();
+              console.log('Bola capturada! Quedan:', dragonBalls.length);
+            }
+          }, 50);
         }
       }
 
