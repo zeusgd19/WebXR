@@ -78,6 +78,7 @@
     let portalPlaced = false;
 
     const captureSound = new Audio('capture.wav');
+    let capturedCount = 0;
 
     init();
     function init() {
@@ -369,7 +370,8 @@ function updateRadar() {
               captureSound.currentTime = 0;
               captureSound.play();
               console.log('Bola capturada! Quedan:', dragonBalls.length);
-              document.getElementById('counter').innerText = `Bolas capturadas: ${7 - dragonBalls.length}`;
+              capturedCount++;
+              document.getElementById('counter').innerText = `Bolas capturadas: ${capturedCount}`;
             }
           }, 50);
         }
