@@ -293,6 +293,12 @@ function updateRadar() {
     const pos = new THREE.Vector3(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
     ball.position.copy(pos);
 
+
+    if(dragonBalls.length >= 7){
+      const oldBall = dragonBalls.shift();
+      scene.remove(oldBall);
+    }
+
     scene.add(ball);
     dragonBalls.push(ball);
 
