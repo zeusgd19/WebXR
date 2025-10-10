@@ -284,22 +284,28 @@ function updateRadar() {
       const playerPos = new THREE.Vector3();
       camera.getWorldPosition(playerPos);
 
-      for(let i = dragonBalls.length - 1; i >= 0; i--) {
+      for (let i = dragonBalls.length - 1; i >= 0; i--) {
         const ball = dragonBalls[i];
+        if (ball.capturing) continue; // evita doble captura
+
         const ballPos = new THREE.Vector3();
         ball.getWorldPosition(ballPos);
-
         const distance = playerPos.distanceTo(ballPos);
-        if (distance < 0.4) { // distancia de captura
-          const mat = ball.material;
 
-          if(!mat.trasparent) mat.transparent = true;
-          let opacity = mat.opacity || 1
+        if (distance < 0.4) {
+          ball.capturing = true;
+          let opacity = 1;
 
           const fade = setInterval(() => {
             opacity -= 0.1;
-            mat.opacity = Math.max(opacity, 0);
-            if (mat.opacity <= 0) {
+            ball.traverse(child => {
+              if (child.isMesh) {
+                child.material.transparent = true;
+                child.material.opacity = Math.max(opacity, 0);
+              }
+            });
+
+            if (opacity <= 0) {
               clearInterval(fade);
               scene.remove(ball);
               dragonBalls.splice(i, 1);
